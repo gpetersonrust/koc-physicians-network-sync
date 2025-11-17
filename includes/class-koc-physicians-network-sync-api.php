@@ -26,7 +26,12 @@ class KOC_Physicians_Network_Sync_API {
                 'methods'             => WP_REST_Server::CREATABLE, // Using CREATABLE for POST
                 'callback'            => array( $this, 'get_physicians_data' ),
                 'permission_callback' => array( $this, 'get_physicians_permissions_check' ),
-              
+                'args'                => array(
+                    'password' => array(
+                        'required'          => true,
+                        'validate_callback' => 'sanitize_text_field',
+                    ),
+                ),
             )
         );
     }
@@ -38,44 +43,19 @@ class KOC_Physicians_Network_Sync_API {
      * @return true|WP_Error True if the request has access, WP_Error object otherwise.
      */
     public function get_physicians_permissions_check( $request ) {
-
-        return true;
         // 1. Check if this is a parent site.
         $options = get_option( 'koc_pns_options', array() );
         if ( ! isset( $options['site_type'] ) || 'parent' !== $options['site_type'] ) {
             return new WP_Error( 'rest_forbidden_context', __( 'This site is not configured as a parent and cannot provide data.', 'koc-physicians-network-sync' ), array( 'status' => 403 ) );
         }
 
-        // 2. Authenticate using Application Password.
-        $username = $request['username'];
-        $password = $request['password'];
+        // 2. Authenticate using the stored application password.
+        $password_from_request = $request['password'];
+        $stored_password = isset( $options['application_password'] ) ? $options['application_password'] : '';
 
-        // First, try the official WordPress Application Password authentication.
-        $user = wp_authenticate_application_password( null, $username, $password );
-
-        // If that fails, and if the site doesn't support application passwords,
-        // check against the password stored in our own options as a fallback.
-        if ( is_wp_error( $user ) && ! function_exists( 'wp_create_user_application_password' ) ) {
-            $stored_password = isset( $options['application_password'] ) ? $options['application_password'] : '';
-
-            // Check if the provided password matches the one we stored.
-            if ( ! empty( $stored_password ) && hash_equals( $stored_password, $password ) ) {
-                // If the password is correct, we still need to validate the user.
-                $user_obj = get_user_by( 'login', $username );
-                if ( $user_obj ) {
-                    // The password matched our fallback and the user exists.
-                    // We can consider this a successful authentication.
-                    $user = $user_obj;
-                }
-            }
+        if ( empty( $stored_password ) || ! hash_equals( $stored_password, $password_from_request ) ) {
+            return new WP_Error( 'rest_invalid_credentials', __( 'Invalid application password provided.', 'koc-physicians-network-sync' ), array( 'status' => 403 ) );
         }
-
-        if ( is_wp_error( $user ) ) {
-            return new WP_Error( 'rest_invalid_credentials', __( 'Invalid user credentials provided.', 'koc-physicians-network-sync' ), array( 'status' => 403 ) );
-        }
-        
-        // At this point, $user is a valid WP_User object. We can proceed with other checks.
-        wp_set_current_user($user->ID);
 
         // 3. Check if the remote IP or domain is allowed.
         $allowed_domains_str = isset( $options['allowed_domains'] ) ? $options['allowed_domains'] : '';

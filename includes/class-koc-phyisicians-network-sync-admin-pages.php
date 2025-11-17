@@ -179,7 +179,6 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
             'method'    => 'POST',
             'timeout'   => 45,
             'body'      => array(
-                'username' => $username,
                 'password' => $password,
             ),
         ) );
@@ -263,6 +262,10 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
             if( $post_id && ! is_wp_error( $post_id ) ) {
                 // Update all meta fields.
                 foreach( $physician['meta'] as $meta_key => $meta_value_array ) {
+                    // Skip updating the featured image.
+                    if ( '_thumbnail_id' === $meta_key ) {
+                        continue;
+                    }
                     // get_post_meta returns an array, so we take the first value.
                     // update_post_meta will serialize if it's an array.
                     update_post_meta( $post_id, $meta_key, $meta_value_array[0] );
