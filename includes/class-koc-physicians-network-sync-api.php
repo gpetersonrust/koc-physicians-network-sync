@@ -26,16 +26,7 @@ class KOC_Physicians_Network_Sync_API {
                 'methods'             => WP_REST_Server::CREATABLE, // Using CREATABLE for POST
                 'callback'            => array( $this, 'get_physicians_data' ),
                 'permission_callback' => array( $this, 'get_physicians_permissions_check' ),
-                'args'                => array(
-                    'username' => array(
-                        'required'          => true,
-                        'validate_callback' => 'sanitize_text_field',
-                    ),
-                    'password' => array(
-                        'required'          => true,
-                        'validate_callback' => 'sanitize_text_field',
-                    ),
-                ),
+              
             )
         );
     }

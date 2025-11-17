@@ -255,9 +255,9 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
                 wp_update_post( $post_data );
                 $updated_count++;
             } else {
-                // Create new post.
-                $post_id = wp_insert_post( $post_data );
-                $created_count++;
+                // Do not create new post and set post id to null 
+                $post_id = null;
+                
             }
             
             if( $post_id && ! is_wp_error( $post_id ) ) {
