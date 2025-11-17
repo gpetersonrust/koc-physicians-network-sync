@@ -355,17 +355,7 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
             'koc_pns_main_section'
         );
 
-        // Child-only: user login.
-        // add_settings_field(
-        //     'koc_pns_child_username',
-        //     __( 'User Login', 'koc-physicians-network-sync' ),
-        //     array( $this, 'child_username_field_cb' ),
-        //     'koc-physicians-network-sync',
-        //     'koc_pns_main_section',
-        //     array(
-        //         'class' => 'koc-pns-child-row',
-        //     )
-        // );
+    
 
         // Child-only: parent URL.
         add_settings_field(
