@@ -100,4 +100,38 @@ class KOC_Physicians_Network_Sync_Admin {
 
 	}
 
+	/**
+	 * Register the meta box for displaying the physician network ID.
+	 *
+	 * @since    1.0.0
+	 */
+	public function register_meta_boxes() {
+		add_meta_box(
+			'koc_physicians_network_id_meta_box',
+			__( 'Physician Network ID', 'koc-physicians-network-sync' ),
+			array( $this, 'render_physician_id_meta_box' ),
+			'physician', // Assuming 'physician' is the CPT slug.
+			'side',
+			'high'
+		);
+	}
+
+	/**
+	 * Render the content of the physician network ID meta box.
+	 *
+	 * @since    1.0.0
+	 * @param    WP_Post    $post    The post object.
+	 */
+	public function render_physician_id_meta_box( $post ) {
+		$network_id = get_post_meta( $post->ID, 'physicians_network_id', true );
+
+		if ( ! empty( $network_id ) ) {
+			echo '<p style="font-weight: bold; font-size: 1.1em; padding: 4px; background: #f0f0f0; border-radius: 4px;">' . esc_html( $network_id ) . '</p>';
+		} else {
+			echo '<p>' . esc_html__( 'No ID has been generated for this physician yet.', 'koc-physicians-network-sync' ) . '</p>';
+		}
+		echo '<p class="description">' . esc_html__( 'This unique ID is used to sync this entry across the network.', 'koc-physicians-network-sync' ) . '</p>';
+	}
+
 }
+

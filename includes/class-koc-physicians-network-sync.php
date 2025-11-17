@@ -78,6 +78,7 @@ class KOC_Physicians_Network_Sync {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+		$this->define_api_hooks();
 
 	}
 
@@ -123,10 +124,19 @@ class KOC_Physicians_Network_Sync {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-koc-physicians-network-sync-public.php';
 
 		/**
-		 * The class responsible for creating admin pages
-		 * side of the site.
+		 * The class responsible for creating admin pages.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-koc-phyisicians-network-sync-admin-pages.php';
+        
+        /**
+         * The class responsible for handling actions from the admin page.
+         */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-koc-physicians-network-sync-parent-actions.php';
+
+		/**
+		 * The class responsible for the plugin's REST API.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-koc-physicians-network-sync-api.php';
 
 		$this->loader = new KOC_Physicians_Network_Sync_Loader();
 
@@ -162,9 +172,16 @@ class KOC_Physicians_Network_Sync {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'register_meta_boxes' );
 
 		$plugin_admin_pages = new KOC_Physicians_Network_Sync_Admin_Pages();
 		$this->loader->add_action( 'admin_menu', $plugin_admin_pages, 'register_admin_pages' );
+		$this->loader->add_action( 'admin_init', $plugin_admin_pages, 'register_settings' );
+		$this->loader->add_action( 'admin_notices', $plugin_admin_pages, 'display_admin_notices' );
+		$this->loader->add_action( 'admin_post_koc_pns_generate_ids', $plugin_admin_pages, 'handle_generate_ids_action' );
+		$this->loader->add_action( 'admin_post_koc_pns_trigger_sync', $plugin_admin_pages, 'handle_trigger_sync_action' );
+		$this->loader->add_action( 'admin_post_koc_pns_generate_app_password', $plugin_admin_pages, 'handle_generate_app_password_action' );
+
 
 	}
 
@@ -183,6 +200,21 @@ class KOC_Physicians_Network_Sync {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
 	}
+    
+    /**
+     * Register all of the hooks related to the REST API functionality
+     * of the plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function define_api_hooks() {
+
+        $plugin_api = new KOC_Physicians_Network_Sync_API();
+
+        $this->loader->add_action( 'rest_api_init', $plugin_api, 'register_routes' );
+
+    }
 
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
