@@ -272,9 +272,15 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
                     if ( '_thumbnail_id' === $meta_key ) {
                         continue;
                     }
-                    // get_post_meta returns an array, so we take the first value.
-                    // update_post_meta will serialize if it's an array.
-                    update_post_meta( $post_id, $meta_key, $meta_value_array[0] );
+
+                    $value_to_save = $meta_value_array[0];
+                    // Check if the value is a serialized string to prevent double-serialization.
+                    if ( is_serialized( $value_to_save ) ) {
+                        // Unserialize it, so update_post_meta can re-serialize it correctly if it's an array.
+                        $value_to_save = unserialize( $value_to_save );
+                    }
+
+                    update_post_meta( $post_id, $meta_key, $value_to_save );
                 }
             }
         }
