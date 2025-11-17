@@ -276,6 +276,7 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
         // Update the 'last_sync' timestamp.
         $options['last_sync'] = current_time( 'mysql' );
         update_option( 'koc_pns_options', $options );
+        wp_cache_delete( 'alloptions', 'options' );
         
         $this->redirect_with_notice( 'sync-success', null, array( 'updated' => $updated_count, 'created' => $created_count ) );
     }
