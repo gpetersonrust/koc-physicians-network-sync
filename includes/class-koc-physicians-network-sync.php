@@ -122,6 +122,12 @@ class KOC_Physicians_Network_Sync {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-koc-physicians-network-sync-public.php';
 
+		/**
+		 * The class responsible for creating admin pages
+		 * side of the site.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-koc-phyisicians-network-sync-admin-pages.php';
+
 		$this->loader = new KOC_Physicians_Network_Sync_Loader();
 
 	}
@@ -156,6 +162,9 @@ class KOC_Physicians_Network_Sync {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+
+		$plugin_admin_pages = new KOC_Physicians_Network_Sync_Admin_Pages();
+		$this->loader->add_action( 'admin_menu', $plugin_admin_pages, 'register_admin_pages' );
 
 	}
 
