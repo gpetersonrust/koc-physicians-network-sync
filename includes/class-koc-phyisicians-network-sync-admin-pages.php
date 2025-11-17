@@ -40,8 +40,7 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
         if ( isset( $_GET['notice'] ) ) {
             // Temporary debug notice
             if ( isset( $_GET['debug_sync'] ) ) {
-                $opts = get_option('koc_pns_options');
-                $last_sync_val = isset($opts['last_sync']) ? $opts['last_sync'] : 'NOT SET';
+                $last_sync_val = get_option('koc_pns_last_sync_time', 'NOT SET');
                 echo '<div class="notice notice-warning is-dismissible"><p>DEBUG: Last Sync value is: ' . esc_html($last_sync_val) . '</p></div>';
             }
 
@@ -280,10 +279,8 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
             }
         }
 
-        // Update the 'last_sync' timestamp.
-        $options['last_sync'] = current_time( 'mysql' );
-        update_option( 'koc_pns_options', $options );
-        wp_cache_delete( 'alloptions', 'options' );
+        // Update the 'last_sync' timestamp in its own option.
+        update_option( 'koc_pns_last_sync_time', current_time( 'mysql' ) );
         
         $this->redirect_with_notice( 'sync-success', null, array( 'updated' => $updated_count, 'created' => $created_count ) );
     }
@@ -572,8 +569,7 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
      * Child: last sync timestamp.
      */
     public function last_sync_field_cb() {
-        $options   = get_option( 'koc_pns_options', array() );
-        $last_sync = isset( $options['last_sync'] ) ? $options['last_sync'] : 'Never';
+        $last_sync = get_option( 'koc_pns_last_sync_time', 'Never' );
         ?>
         <p><strong><?php echo esc_html( $last_sync ); ?></strong></p>
         <p class="description">
@@ -633,12 +629,7 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
             $sanitized['sync_frequency'] = '4h';
         }
 
-        // Preserve the last_sync value, as it is not user-editable.
-        if ( isset( $existing_options['last_sync'] ) ) {
-            $sanitized['last_sync'] = $existing_options['last_sync'];
-        }
-
-
+        // The 'last_sync' value is now stored in its own option and is not part of this array.
         return $sanitized;
     }
 
