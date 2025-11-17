@@ -55,6 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const childRows  = document.querySelectorAll('tr.koc-pns-child-row');
     const parentActions = document.getElementById('koc-pns-parent-actions');
     const childActions = document.getElementById('koc-pns-child-actions');
+    const passwordInput = document.getElementById('koc_pns_application_password');
+    const copyButton = document.getElementById('koc-pns-copy-password');
 
     function updateVisibility() {
         const checked = document.querySelector('input[name="koc_pns_options[site_type]"]:checked');
@@ -74,6 +76,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (childActions) {
             childActions.style.display = (type === 'child') ? 'block' : 'none';
+        }
+
+        // Dynamically update the password field based on site type.
+        if (passwordInput) {
+            if (type === 'parent') {
+                passwordInput.readOnly = true;
+                if (copyButton) {
+                    copyButton.style.display = '';
+                }
+            } else { // child
+                passwordInput.readOnly = false;
+                if (copyButton) {
+                    copyButton.style.display = 'none';
+                }
+            }
         }
     }
 

@@ -349,7 +349,7 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
         // Child-only: application password.
         add_settings_field(
             'koc_pns_application_password',
-            __( 'Password to Copy', 'koc-physicians-network-sync' ),
+            __( 'Application Password', 'koc-physicians-network-sync' ),
             array( $this, 'application_password_field_cb' ),
             'koc-physicians-network-sync',
             'koc_pns_main_section'
@@ -485,10 +485,16 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
         $site_type        = isset( $options['site_type'] ) ? $options['site_type'] : 'parent';
 
         $description = '';
+        $input_attributes = '';
+        $show_copy_button = false;
+
         if ( 'parent' === $site_type ) {
             $description = esc_html__( 'Application password generated on this parent site for a child site to authenticate.', 'koc-physicians-network-sync' );
-        } else {
-            $description = esc_html__( 'Application password provided by the parent site for this child site to authenticate.', 'koc-physicians-network-sync' );
+            $input_attributes = 'readonly="readonly"';
+            $show_copy_button = true;
+        } else { // 'child'
+            $description = esc_html__( 'Application password provided by the parent site for this child site to authenticate. Paste it here and save changes.', 'koc-physicians-network-sync' );
+            // No readonly attribute, so it's editable.
         }
 
         ?>
@@ -498,13 +504,18 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
                    name="koc_pns_options[application_password]"
                    value="<?php echo esc_attr( $application_pass ); ?>"
                    class="regular-text"
-                   autocomplete="off" />
-            <button type="button" class="button button-secondary" id="koc-pns-copy-password"><?php esc_html_e( 'Copy', 'koc-physicians-network-sync' ); ?></button>
+                   autocomplete="off"
+                   <?php echo $input_attributes; ?> />
+            <?php if ( $show_copy_button ) : ?>
+                <button type="button" class="button button-secondary" id="koc-pns-copy-password"><?php esc_html_e( 'Copy', 'koc-physicians-network-sync' ); ?></button>
+            <?php endif; ?>
         </div>
         <p class="description">
             <?php echo $description; ?>
-            <br>
-            <em><?php esc_html_e( 'This value is not editable, but can be copied.', 'koc-physicians-network-sync' ); ?></em>
+            <?php if ( 'parent' === $site_type ) : ?>
+                <br>
+                <em><?php esc_html_e( 'This value is not editable, but can be copied.', 'koc-physicians-network-sync' ); ?></em>
+            <?php endif; ?>
         </p>
         <?php
     }
