@@ -166,10 +166,10 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
 
         $options = get_option( 'koc_pns_options', array() );
         $parent_url = isset( $options['parent_url'] ) ? $options['parent_url'] : '';
-        $username = isset( $options['child_username'] ) ? $options['child_username'] : '';
+       
         $password = isset( $options['application_password'] ) ? $options['application_password'] : '';
 
-        if ( empty( $parent_url ) || empty( $username ) || empty( $password ) ) {
+        if ( empty( $parent_url ) || empty( $password ) ) {
             $this->redirect_with_notice( 'sync-failed', 'missing_credentials' );
         }
 
