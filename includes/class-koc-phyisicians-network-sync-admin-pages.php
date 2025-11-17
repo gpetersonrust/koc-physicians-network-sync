@@ -38,6 +38,13 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
         }
 
         if ( isset( $_GET['notice'] ) ) {
+            // Temporary debug notice
+            if ( isset( $_GET['debug_sync'] ) ) {
+                $opts = get_option('koc_pns_options');
+                $last_sync_val = isset($opts['last_sync']) ? $opts['last_sync'] : 'NOT SET';
+                echo '<div class="notice notice-warning is-dismissible"><p>DEBUG: Last Sync value is: ' . esc_html($last_sync_val) . '</p></div>';
+            }
+
             $notice_type = $_GET['notice'];
             $message = '';
             $class = 'notice-info';
@@ -290,6 +297,10 @@ class KOC_Physicians_Network_Sync_Admin_Pages {
             'page'      => 'koc-physicians-network-sync',
             'notice'    => $notice_type,
         );
+
+        if ( $notice_type === 'sync-success' ) {
+            $query_args['debug_sync'] = '1';
+        }
 
         if ( $error_code ) {
             $query_args['error'] = $error_code;
